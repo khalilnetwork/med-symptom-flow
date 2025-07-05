@@ -66,7 +66,7 @@ export const SymptomGrid = ({ selectedSymptoms, onSymptomSelect, language }: Sym
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 rounded-3xl">
       {cardLevels.map((level, levelIndex) => (
         <div
           key={level.id}
