@@ -7,17 +7,17 @@ interface PainScaleModuleProps {
 
 export const PainScaleModule = ({ value, onChange, language }: PainScaleModuleProps) => {
   const getPainLevel = (level: number) => {
-    if (level <= 3) return { text: language === 'fr' ? 'Léger' : 'خفيف', color: 'text-green-600' };
-    if (level <= 6) return { text: language === 'fr' ? 'Modéré' : 'متوسط', color: 'text-yellow-600' };
-    return { text: language === 'fr' ? 'Sévère' : 'شديد', color: 'text-red-600' };
+    if (level <= 3) return { text: language === 'fr' ? 'Léger' : 'خفيف', color: 'text-green-400' };
+    if (level <= 6) return { text: language === 'fr' ? 'Modéré' : 'متوسط', color: 'text-yellow-400' };
+    return { text: language === 'fr' ? 'Sévère' : 'شديد', color: 'text-red-400' };
   };
 
   const painLevel = getPainLevel(value);
 
   return (
     <div className="space-y-4">
-      <h4 className="text-sm font-medium text-medical-slate-700">
-        🔥 {language === 'fr' ? 'Niveau de douleur (0-10)' : 'مستوى الألم (0-10)'}
+      <h4 className="text-sm font-medium text-slate-200">
+        {language === 'fr' ? 'Niveau de douleur (0-10)' : 'مستوى الألم (0-10)'}
       </h4>
       
       <div className="grid grid-cols-11 gap-1">
@@ -26,12 +26,15 @@ export const PainScaleModule = ({ value, onChange, language }: PainScaleModulePr
             key={i}
             onClick={() => onChange(i)}
             className={`
-              h-12 rounded-lg border-2 font-bold text-sm transition-all duration-200
+              h-12 rounded-lg border font-bold text-sm transition-all duration-300
               ${value === i
-                ? 'border-medical-cyan-500 bg-medical-cyan-500 text-white'
-                : 'border-medical-slate-200 bg-white hover:border-medical-cyan-300 text-medical-slate-600'
+                ? 'border-blue-500 bg-blue-600/50 text-blue-200 shadow-lg'
+                : 'border-slate-600 bg-slate-800/50 hover:border-blue-400 text-slate-300'
               }
             `}
+            style={value === i ? { 
+              boxShadow: '0 0 15px rgba(59, 130, 246, 0.5)' 
+            } : {}}
           >
             {i}
           </button>

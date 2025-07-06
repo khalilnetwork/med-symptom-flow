@@ -42,7 +42,7 @@ export const ClickableResponseModule = ({
 
   return (
     <div className="space-y-3">
-      <h4 className="text-sm font-medium text-medical-slate-700 mb-3">
+      <h4 className="text-sm font-medium text-slate-200 mb-3">
         {title}
       </h4>
       
@@ -52,15 +52,17 @@ export const ClickableResponseModule = ({
             key={option.value}
             onClick={() => handleClick(option.value)}
             className={`
-              p-3 rounded-lg border-2 transition-all duration-200 text-sm font-medium
+              p-3 rounded-lg border transition-all duration-300 text-sm font-medium
               ${isSelected(option.value)
-                ? 'border-medical-cyan-500 bg-medical-cyan-50 text-medical-cyan-700'
-                : 'border-medical-slate-200 bg-white hover:border-medical-cyan-300 text-medical-slate-600'
+                ? 'border-blue-500 bg-blue-600/30 text-blue-200 shadow-lg'
+                : 'border-slate-600 bg-slate-800/50 hover:border-blue-400 text-slate-300 hover:bg-slate-700/50'
               }
             `}
+            style={isSelected(option.value) ? { 
+              boxShadow: '0 0 20px rgba(59, 130, 246, 0.3)' 
+            } : {}}
           >
-            <div className="flex items-center justify-center space-x-2">
-              {option.icon && <span>{option.icon}</span>}
+            <div className="flex items-center justify-center">
               <span className="text-center">{option.label}</span>
             </div>
           </button>

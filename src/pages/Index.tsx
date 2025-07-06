@@ -84,8 +84,13 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-medical-cyan-50 via-medical-lavender-50 to-medical-slate-50">
-      <div className="flex flex-col h-screen">
+    <div className="min-h-screen bg-slate-900 relative overflow-hidden">
+      {/* Futuristic background orbs */}
+      <div className="floating-orb"></div>
+      <div className="floating-orb"></div>
+      <div className="floating-orb"></div>
+      
+      <div className="flex flex-col h-screen relative z-10">
         <MedicalHeader 
           patientData={patientData}
           language={language}
@@ -97,15 +102,15 @@ const Index = () => {
             <div className="max-w-7xl mx-auto p-6">
               {/* Hero Section */}
               <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-medical-cyan-400 to-medical-lavender-400 rounded-3xl mb-6 shadow-lg">
-                  <div className="text-3xl">🩺</div>
+                <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-600 to-purple-600 rounded-3xl mb-6 shadow-2xl border border-blue-500/30">
+                  <div className="text-3xl text-white neon-glow">🩺</div>
                 </div>
                 
-                <h1 className="text-4xl font-bold text-medical-slate-800 mb-4">
+                <h1 className="text-4xl font-bold text-slate-100 mb-4 neon-glow">
                   {language === 'fr' ? 'Assistant de Triage Médical' : 'مساعد الفرز الطبي'}
                 </h1>
                 
-                <p className="text-lg text-medical-slate-600 max-w-2xl mx-auto">
+                <p className="text-lg text-slate-300 max-w-2xl mx-auto">
                   {language === 'fr' 
                     ? 'Cliquez sur une zone anatomique du corps humain. L\'assistant vous guidera avec la méthode OCRSTFIT pour une évaluation complète.' 
                     : 'انقر على منطقة تشريحية من جسم الإنسان. سيرشدك المساعد بطريقة OCRSTFIT لتقييم شامل.'
@@ -113,9 +118,9 @@ const Index = () => {
                 </p>
                 
                 {assessments.length > 0 && (
-                  <div className="mt-6 inline-flex items-center px-4 py-2 bg-gradient-to-r from-medical-cyan-100 to-medical-lavender-100 rounded-full">
-                    <div className="w-3 h-3 bg-medical-cyan-400 rounded-full animate-pulse mr-3"></div>
-                    <span className="text-sm font-medium text-medical-slate-700">
+                  <div className="mt-6 inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-full border border-blue-500/30 border-glow">
+                    <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse mr-3" style={{ boxShadow: '0 0 10px rgba(59, 130, 246, 0.8)' }}></div>
+                    <span className="text-sm font-medium text-slate-200">
                       {assessments.filter(a => a.completed).length} {language === 'fr' ? 'zone(s) évaluée(s)' : 'منطقة مُقيمة'}
                     </span>
                   </div>
@@ -154,7 +159,7 @@ const Index = () => {
         </div>
         
         {/* Control Panel */}
-        <div className="sticky bottom-0 bg-white/80 backdrop-blur-lg border-t border-white/20">
+        <div className="sticky bottom-0 bg-slate-900/80 backdrop-blur-lg border-t border-blue-500/30">
           <ControlPanel
             hasSymptoms={assessments.length > 0}
             onClear={clearAll}
