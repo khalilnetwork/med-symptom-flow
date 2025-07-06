@@ -1,14 +1,36 @@
 
 import { Button } from '@/components/ui/button';
 import { RotateCcw, Download, ArrowRight } from 'lucide-react';
+import { ClinicalSummaryModal } from './ClinicalSummaryModal';
+
+interface SymptomAssessment {
+  zoneId: string;
+  zoneName: string;
+  answers: Record<string, any>;
+  completed: boolean;
+}
+
+interface PatientData {
+  name: string;
+  age: number;
+  consultationTime: string;
+}
 
 interface ControlPanelProps {
   hasSymptoms: boolean;
   onClear: () => void;
   language: 'fr' | 'ar';
+  assessments: SymptomAssessment[];
+  patientData: PatientData;
 }
 
-export const ControlPanel = ({ hasSymptoms, onClear, language }: ControlPanelProps) => {
+export const ControlPanel = ({ 
+  hasSymptoms, 
+  onClear, 
+  language, 
+  assessments, 
+  patientData 
+}: ControlPanelProps) => {
   const handleExport = () => {
     // This would typically export the SOAP summary
     console.log('Exporting SOAP summary...');
@@ -47,13 +69,19 @@ export const ControlPanel = ({ hasSymptoms, onClear, language }: ControlPanelPro
             }
           </div>
           
-          <Button
-            disabled={!hasSymptoms}
-            className="bg-gradient-to-r from-medical-cyan-500 to-medical-lavender-500 hover:from-medical-cyan-600 hover:to-medical-lavender-600 text-white px-6"
+          <ClinicalSummaryModal
+            assessments={assessments}
+            patientData={patientData}
+            language={language}
           >
-            {language === 'fr' ? 'Transmettre au médecin' : 'إرسال للطبيب'}
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
+            <Button
+              disabled={!hasSymptoms}
+              className="bg-gradient-to-r from-medical-cyan-500 to-medical-lavender-500 hover:from-medical-cyan-600 hover:to-medical-lavender-600 text-white px-6"
+            >
+              {language === 'fr' ? 'Transmettre au médecin' : 'إرسال للطبيب'}
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </ClinicalSummaryModal>
         </div>
       </div>
     </footer>

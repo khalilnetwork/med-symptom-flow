@@ -164,6 +164,8 @@ const Index = () => {
             hasSymptoms={assessments.length > 0}
             onClear={clearAll}
             language={language}
+            assessments={assessments}
+            patientData={patientData}
           />
         </div>
       </div>
