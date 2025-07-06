@@ -1,4 +1,3 @@
-
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { FileText, MapPin, Clock, Zap, Activity, Stethoscope, Pill, User } from 'lucide-react';
@@ -58,9 +57,16 @@ export const ClinicalSummary = ({ assessments, patientData, language }: Clinical
   };
 
   const generateSOAPSummary = () => {
-    if (assessments.length === 0) return '';
-
     const completedAssessments = assessments.filter(a => a.completed);
+    
+    if (completedAssessments.length === 0) {
+      return {
+        chiefComplaint: '',
+        associatedSymptoms: [],
+        completedZones: 0
+      };
+    }
+
     const mainSymptoms = completedAssessments.map(assessment => {
       const onset = getAnswerText('onset', assessment.answers.onset);
       const character = getAnswerText('character', assessment.answers.character);
