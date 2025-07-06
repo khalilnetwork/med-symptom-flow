@@ -1,13 +1,11 @@
-
 import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
-import { Checkbox } from '@/components/ui/checkbox';
 import { MessageCircle, ArrowRight, ArrowLeft } from 'lucide-react';
+import { ClickableResponseModule } from './ClickableResponseModule';
+import { PainScaleModule } from './PainScaleModule';
 
 interface OCRSTFITQuestion {
   id: string;
@@ -259,6 +257,89 @@ export const MedicalAssistant = ({ selectedZone, onAssessmentComplete, language 
     setIsCompleted(false);
   };
 
+  const renderQuestionInput = () => {
+    if (currentQuestion.type === 'select') {
+      return (
+        <ClickableResponseModule
+          title={`${currentQuestion.step} - ${currentQuestion.question[language]}`}
+          options={currentQuestion.options?.map(opt => ({
+            value: opt.value,
+            label: opt[language],
+            icon: getQuestionIcon(currentQuestion.step)
+          })) || []}
+          selectedValues={answers[currentQuestion.id] || ''}
+          onSelect={(value) => handleAnswerChange(currentQuestion.id, value)}
+          language={language}
+        />
+      );
+    }
+
+    if (currentQuestion.type === 'multiselect') {
+      return (
+        <ClickableResponseModule
+          title={`${currentQuestion.step} - ${currentQuestion.question[language]}`}
+          options={currentQuestion.options?.map(opt => ({
+            value: opt.value,
+            label: opt[language],
+            icon: getQuestionIcon(currentQuestion.step)
+          })) || []}
+          selectedValues={answers[currentQuestion.id] || []}
+          onSelect={(value) => handleAnswerChange(currentQuestion.id, value)}
+          multiple={true}
+          language={language}
+        />
+      );
+    }
+
+    if (currentQuestion.type === 'scale') {
+      return (
+        <PainScaleModule
+          value={answers[currentQuestion.id] || 0}
+          onChange={(value) => handleAnswerChange(currentQuestion.id, value)}
+          language={language}
+        />
+      );
+    }
+
+    if (currentQuestion.type === 'text') {
+      return (
+        <div className="space-y-3">
+          <Label className="text-medical-slate-700 font-medium text-base">
+            <span className="inline-flex items-center justify-center w-6 h-6 bg-medical-cyan-500 text-white rounded-full text-sm font-bold mr-2">
+              {currentQuestion.step}
+            </span>
+            {currentQuestion.question[language]}
+            {currentQuestion.required && <span className="text-red-500 ml-1">*</span>}
+          </Label>
+          <Input
+            type="text"
+            value={answers[currentQuestion.id] || ''}
+            onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
+            className="glass border-white/30"
+            placeholder={language === 'fr' ? 'Précisez...' : 'حدد...'}
+          />
+        </div>
+      );
+    }
+  };
+
+  const getQuestionIcon = (step: string) => {
+    const icons: Record<string, string> = {
+      'O': '⏱',
+      'C': '🧠',
+      'R': '🔁',
+      'S': '🔥',
+      'T': '🕒',
+      'I': '📋',
+      'F1': '⚠️',
+      'F2': '✅',
+      'T2': '📆',
+      'T3': '🔄',
+      'T4': '🎯'
+    };
+    return icons[step] || '';
+  };
+
   if (!selectedZone) {
     return (
       <Card className="glass-card p-6 text-center">
@@ -330,95 +411,7 @@ export const MedicalAssistant = ({ selectedZone, onAssessmentComplete, language 
       </div>
 
       <div className="space-y-6">
-        <div>
-          <Label className="text-medical-slate-700 font-medium text-base mb-4 block">
-            <span className="inline-flex items-center justify-center w-6 h-6 bg-medical-cyan-500 text-white rounded-full text-sm font-bold mr-2">
-              {currentQuestion.step}
-            </span>
-            {currentQuestion.question[language]}
-            {currentQuestion.required && <span className="text-red-500 ml-1">*</span>}
-          </Label>
-
-          {currentQuestion.type === 'select' && (
-            <Select
-              value={answers[currentQuestion.id] || ''}
-              onValueChange={(value) => handleAnswerChange(currentQuestion.id, value)}
-            >
-              <SelectTrigger className="glass border-white/30">
-                <SelectValue placeholder={language === 'fr' ? 'Sélectionnez...' : 'اختر...'} />
-              </SelectTrigger>
-              <SelectContent className="bg-white/95 backdrop-blur-md">
-                {currentQuestion.options?.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option[language]}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-
-          {currentQuestion.type === 'multiselect' && (
-            <div className="grid grid-cols-1 gap-3">
-              {currentQuestion.options?.map((option) => (
-                <div key={option.value} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`${currentQuestion.id}-${option.value}`}
-                    checked={(answers[currentQuestion.id] || []).includes(option.value)}
-                    onCheckedChange={(checked) => {
-                      const currentValues = answers[currentQuestion.id] || [];
-                      if (checked) {
-                        handleAnswerChange(currentQuestion.id, [...currentValues, option.value]);
-                      } else {
-                        handleAnswerChange(currentQuestion.id, currentValues.filter((v: string) => v !== option.value));
-                      }
-                    }}
-                  />
-                  <Label
-                    htmlFor={`${currentQuestion.id}-${option.value}`}
-                    className="text-sm cursor-pointer"
-                  >
-                    {option[language]}
-                  </Label>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {currentQuestion.type === 'scale' && (
-            <div className="space-y-4">
-              <Slider
-                value={[answers[currentQuestion.id] || 0]}
-                onValueChange={(value) => handleAnswerChange(currentQuestion.id, value[0])}
-                max={10}
-                min={0}
-                step={1}
-                className="w-full"
-              />
-              <div className="flex justify-between text-sm text-medical-slate-600">
-                <span>0</span>
-                <span className="font-medium text-lg">
-                  {answers[currentQuestion.id] || 0}/10
-                </span>
-                <span>10</span>
-              </div>
-              <div className="text-xs text-medical-slate-500 text-center">
-                {(answers[currentQuestion.id] || 0) <= 3 && (language === 'fr' ? 'Léger' : 'خفيف')}
-                {(answers[currentQuestion.id] || 0) >= 4 && (answers[currentQuestion.id] || 0) <= 6 && (language === 'fr' ? 'Modéré' : 'متوسط')}
-                {(answers[currentQuestion.id] || 0) >= 7 && (language === 'fr' ? 'Sévère' : 'شديد')}
-              </div>
-            </div>
-          )}
-
-          {currentQuestion.type === 'text' && (
-            <Input
-              type="text"
-              value={answers[currentQuestion.id] || ''}
-              onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
-              className="glass border-white/30"
-              placeholder={language === 'fr' ? 'Précisez...' : 'حدد...'}
-            />
-          )}
-        </div>
+        {renderQuestionInput()}
       </div>
 
       <div className="flex justify-between mt-8">

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { MedicalHeader } from '@/components/MedicalHeader';
 import { BodySilhouette } from '@/components/BodySilhouette';
@@ -93,11 +92,11 @@ const Index = () => {
           onLanguageToggle={() => setLanguage(prev => prev === 'fr' ? 'ar' : 'fr')}
         />
         
-        <div className="flex-1 flex overflow-hidden">
-          <main className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-hidden">
+          <main className="h-full overflow-y-auto">
             <div className="max-w-7xl mx-auto p-6">
               {/* Hero Section */}
-              <div className="text-center mb-12">
+              <div className="text-center mb-8">
                 <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-medical-cyan-400 to-medical-lavender-400 rounded-3xl mb-6 shadow-lg">
                   <div className="text-3xl">🩺</div>
                 </div>
@@ -123,9 +122,8 @@ const Index = () => {
                 )}
               </div>
               
-              {/* Main Interface */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Body Silhouette */}
+              {/* Main Interface - Body Silhouette and Medical Assistant Side by Side */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                 <div className="space-y-6">
                   <BodySilhouette
                     onZoneClick={handleZoneClick}
@@ -134,7 +132,6 @@ const Index = () => {
                   />
                 </div>
                 
-                {/* Medical Assistant */}
                 <div className="space-y-6">
                   <MedicalAssistant
                     selectedZone={selectedZone}
@@ -143,22 +140,20 @@ const Index = () => {
                   />
                 </div>
               </div>
+
+              {/* Clinical Summary at Bottom */}
+              <div className="mt-8">
+                <ClinicalSummary
+                  assessments={assessments}
+                  patientData={patientData}
+                  language={language}
+                />
+              </div>
             </div>
           </main>
-          
-          {/* Clinical Summary Panel */}
-          <div className="w-96 border-l border-white/20 bg-white/60 backdrop-blur-sm overflow-y-auto">
-            <div className="p-6">
-              <ClinicalSummary
-                assessments={assessments}
-                patientData={patientData}
-                language={language}
-              />
-            </div>
-          </div>
         </div>
         
-        {/* Floating Control Panel */}
+        {/* Control Panel */}
         <div className="sticky bottom-0 bg-white/80 backdrop-blur-lg border-t border-white/20">
           <ControlPanel
             hasSymptoms={assessments.length > 0}
