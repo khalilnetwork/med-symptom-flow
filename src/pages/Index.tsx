@@ -1,16 +1,39 @@
 
 import { useState } from 'react';
 import { MedicalHeader } from '@/components/MedicalHeader';
-import { SymptomGrid } from '@/components/SymptomGrid';
-import { SymptomModal } from '@/components/SymptomModal';
-import { SummaryPanel } from '@/components/SummaryPanel';
+import { BodySilhouette } from '@/components/BodySilhouette';
+import { MedicalAssistant } from '@/components/MedicalAssistant';
+import { ClinicalSummary } from '@/components/ClinicalSummary';
 import { ControlPanel } from '@/components/ControlPanel';
-import { Symptom, PatientData, SymptomDetail } from '@/types/medical';
+import { PatientData } from '@/types/medical';
+
+interface SymptomAssessment {
+  zoneId: string;
+  zoneName: string;
+  answers: Record<string, any>;
+  completed: boolean;
+}
+
+interface BodyZone {
+  id: string;
+  name: {
+    fr: string;
+    ar: string;
+  };
+}
+
+interface SymptomVisualization {
+  zoneId: string;
+  intensity: number;
+  type: string;
+  hasIrradiation: boolean;
+  irradiationZones?: string[];
+}
 
 const Index = () => {
-  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
-  const [activeSymptom, setActiveSymptom] = useState<Symptom | null>(null);
-  const [symptomDetails, setSymptomDetails] = useState<Record<string, SymptomDetail>>({});
+  const [selectedZone, setSelectedZone] = useState<BodyZone | null>(null);
+  const [assessments, setAssessments] = useState<SymptomAssessment[]>([]);
+  const [symptomVisualizations, setSymptomVisualizations] = useState<SymptomVisualization[]>([]);
   const [language, setLanguage] = useState<'fr' | 'ar'>('fr');
   const [patientData, setPatientData] = useState<PatientData>({
     name: 'Ahmed Ben Salah',
@@ -18,36 +41,47 @@ const Index = () => {
     consultationTime: new Date().toLocaleString('fr-FR')
   });
 
-  const handleSymptomSelect = (symptom: Symptom) => {
-    if (selectedSymptoms.includes(symptom.id)) {
-      // Remove symptom
-      setSelectedSymptoms(prev => prev.filter(id => id !== symptom.id));
-      const newDetails = { ...symptomDetails };
-      delete newDetails[symptom.id];
-      setSymptomDetails(newDetails);
-    } else {
-      // Add symptom
-      setSelectedSymptoms(prev => [...prev, symptom.id]);
-      // Don't automatically open modal, let the cascading cards handle the flow
-    }
+  const handleZoneClick = (zone: BodyZone) => {
+    setSelectedZone(zone);
   };
 
-  const handleSymptomDetailSubmit = (symptomId: string, details: SymptomDetail) => {
-    setSymptomDetails(prev => ({
-      ...prev,
-      [symptomId]: details
-    }));
-    setActiveSymptom(null);
-  };
+  const handleAssessmentComplete = (assessment: SymptomAssessment) => {
+    // Update assessments
+    setAssessments(prev => {
+      const existing = prev.find(a => a.zoneId === assessment.zoneId);
+      if (existing) {
+        return prev.map(a => a.zoneId === assessment.zoneId ? assessment : a);
+      }
+      return [...prev, assessment];
+    });
 
-  const handleCloseModal = () => {
-    setActiveSymptom(null);
+    // Create visualization
+    const visualization: SymptomVisualization = {
+      zoneId: assessment.zoneId,
+      intensity: assessment.answers.severity || 0,
+      type: assessment.answers.character || 'unknown',
+      hasIrradiation: assessment.answers.radiation && 
+                     assessment.answers.radiation.length > 0 && 
+                     !assessment.answers.radiation.includes('none'),
+      irradiationZones: assessment.answers.radiation?.filter((r: string) => r !== 'none') || []
+    };
+
+    setSymptomVisualizations(prev => {
+      const existing = prev.find(v => v.zoneId === assessment.zoneId);
+      if (existing) {
+        return prev.map(v => v.zoneId === assessment.zoneId ? visualization : v);
+      }
+      return [...prev, visualization];
+    });
+
+    // Clear selected zone to show completion
+    setSelectedZone(null);
   };
 
   const clearAll = () => {
-    setSelectedSymptoms([]);
-    setSymptomDetails({});
-    setActiveSymptom(null);
+    setAssessments([]);
+    setSymptomVisualizations([]);
+    setSelectedZone(null);
   };
 
   return (
@@ -69,64 +103,70 @@ const Index = () => {
                 </div>
                 
                 <h1 className="text-4xl font-bold text-medical-slate-800 mb-4">
-                  {language === 'fr' ? 'Assistant de Triage' : 'مساعد الفرز الطبي'}
+                  {language === 'fr' ? 'Assistant de Triage Médical' : 'مساعد الفرز الطبي'}
                 </h1>
                 
                 <p className="text-lg text-medical-slate-600 max-w-2xl mx-auto">
                   {language === 'fr' 
-                    ? 'Sélectionnez les symptômes du patient. L\'interface s\'adaptera dynamiquement pour approfondir chaque symptôme choisi.' 
-                    : 'اختر أعراض المريض. ستتكيف الواجهة ديناميكيًا لتعميق كل عرض مختار.'
+                    ? 'Cliquez sur une zone anatomique du corps humain. L\'assistant vous guidera avec la méthode OCRSTFIT pour une évaluation complète.' 
+                    : 'انقر على منطقة تشريحية من جسم الإنسان. سيرشدك المساعد بطريقة OCRSTFIT لتقييم شامل.'
                   }
                 </p>
                 
-                {selectedSymptoms.length > 0 && (
+                {assessments.length > 0 && (
                   <div className="mt-6 inline-flex items-center px-4 py-2 bg-gradient-to-r from-medical-cyan-100 to-medical-lavender-100 rounded-full">
                     <div className="w-3 h-3 bg-medical-cyan-400 rounded-full animate-pulse mr-3"></div>
                     <span className="text-sm font-medium text-medical-slate-700">
-                      {selectedSymptoms.length} {language === 'fr' ? 'symptôme(s) sélectionné(s)' : 'عَرَض محدد'}
+                      {assessments.filter(a => a.completed).length} {language === 'fr' ? 'zone(s) évaluée(s)' : 'منطقة مُقيمة'}
                     </span>
                   </div>
                 )}
               </div>
               
-              {/* Dynamic Symptom Grid */}
-              <SymptomGrid
-                selectedSymptoms={selectedSymptoms}
-                onSymptomSelect={handleSymptomSelect}
-                language={language}
-              />
+              {/* Main Interface */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Body Silhouette */}
+                <div className="space-y-6">
+                  <BodySilhouette
+                    onZoneClick={handleZoneClick}
+                    symptomVisualizations={symptomVisualizations}
+                    language={language}
+                  />
+                </div>
+                
+                {/* Medical Assistant */}
+                <div className="space-y-6">
+                  <MedicalAssistant
+                    selectedZone={selectedZone}
+                    onAssessmentComplete={handleAssessmentComplete}
+                    language={language}
+                  />
+                </div>
+              </div>
             </div>
           </main>
           
-          {/* Summary Panel - Always visible but collapsible on mobile */}
-          <div className="w-80 border-l border-white/20 bg-white/60 backdrop-blur-sm">
-            <SummaryPanel
-              selectedSymptoms={selectedSymptoms}
-              symptomDetails={symptomDetails}
-              patientData={patientData}
-              language={language}
-            />
+          {/* Clinical Summary Panel */}
+          <div className="w-96 border-l border-white/20 bg-white/60 backdrop-blur-sm overflow-y-auto">
+            <div className="p-6">
+              <ClinicalSummary
+                assessments={assessments}
+                patientData={patientData}
+                language={language}
+              />
+            </div>
           </div>
         </div>
         
         {/* Floating Control Panel */}
         <div className="sticky bottom-0 bg-white/80 backdrop-blur-lg border-t border-white/20">
           <ControlPanel
-            hasSymptoms={selectedSymptoms.length > 0}
+            hasSymptoms={assessments.length > 0}
             onClear={clearAll}
             language={language}
           />
         </div>
       </div>
-      
-      {activeSymptom && (
-        <SymptomModal
-          symptom={activeSymptom}
-          onSubmit={handleSymptomDetailSubmit}
-          onClose={handleCloseModal}
-          language={language}
-        />
-      )}
     </div>
   );
 };
