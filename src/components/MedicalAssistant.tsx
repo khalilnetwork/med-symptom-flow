@@ -11,7 +11,7 @@ import { MessageCircle, ArrowRight, ArrowLeft } from 'lucide-react';
 
 interface OCRSTFITQuestion {
   id: string;
-  step: 'O' | 'C' | 'R' | 'S' | 'T' | 'F' | 'I' | 'T2';
+  step: 'O' | 'C' | 'R' | 'S' | 'T' | 'F1' | 'F2' | 'I' | 'T2' | 'T3' | 'T4';
   question: {
     fr: string;
     ar: string;
@@ -38,107 +38,158 @@ const ocrstfitQuestions: OCRSTFITQuestion[] = [
   {
     id: 'onset',
     step: 'O',
-    question: { fr: 'Depuis quand ce symptôme est-il présent ?', ar: 'منذ متى هذا العرض موجود؟' },
+    question: { fr: 'Comment cela a commencé ?', ar: 'كيف بدأ هذا؟' },
     type: 'select',
     options: [
-      { value: 'minutes', fr: 'Quelques minutes', ar: 'بضع دقائق' },
-      { value: 'hours', fr: 'Quelques heures', ar: 'بضع ساعات' },
-      { value: 'days', fr: 'Quelques jours', ar: 'بضعة أيام' },
-      { value: 'weeks', fr: 'Quelques semaines', ar: 'بضعة أسابيع' },
-      { value: 'months', fr: 'Quelques mois', ar: 'بضعة أشهر' }
+      { value: 'brutal', fr: 'Brutal', ar: 'مفاجئ' },
+      { value: 'progressif', fr: 'Progressif', ar: 'تدريجي' },
+      { value: 'post-trauma', fr: 'Post-trauma', ar: 'بعد صدمة' },
+      { value: 'post-meal', fr: 'Après repas', ar: 'بعد الوجبة' },
+      { value: 'unknown', fr: 'Inconnu', ar: 'غير معروف' }
     ],
     required: true
   },
   {
     id: 'character',
     step: 'C',
-    question: { fr: 'Quel est le type exact de sensation ?', ar: 'ما هو النوع الدقيق للإحساس؟' },
+    question: { fr: 'Quelle est la sensation ?', ar: 'ما هو الإحساس؟' },
     type: 'select',
     options: [
-      { value: 'sharp', fr: 'Douleur aiguë/coupante', ar: 'ألم حاد/قاطع' },
       { value: 'burning', fr: 'Brûlure', ar: 'حرقة' },
-      { value: 'throbbing', fr: 'Pulsatile/battements', ar: 'نابض' },
-      { value: 'cramping', fr: 'Crampes/serrement', ar: 'تشنج/انقباض' },
+      { value: 'stabbing', fr: 'Élancements', ar: 'طعن' },
+      { value: 'tightness', fr: 'Serrement', ar: 'انقباض' },
       { value: 'tingling', fr: 'Picotements', ar: 'وخز' },
+      { value: 'pulsating', fr: 'Pulsation', ar: 'نبض' },
       { value: 'numbness', fr: 'Engourdissement', ar: 'خدر' },
-      { value: 'pressure', fr: 'Pression/lourdeur', ar: 'ضغط/ثقل' }
+      { value: 'heaviness', fr: 'Lourdeur', ar: 'ثقل' }
     ],
     required: true
   },
   {
     id: 'radiation',
     step: 'R',
-    question: { fr: 'Est-ce que cela irradie ? Vers où ?', ar: 'هل ينتشر؟ إلى أين؟' },
-    type: 'multiselect',
+    question: { fr: 'Est-ce que ça se propage ?', ar: 'هل ينتشر؟' },
+    type: 'select',
     options: [
-      { value: 'none', fr: 'Pas d\'irradiation', ar: 'لا ينتشر' },
-      { value: 'up', fr: 'Vers le haut', ar: 'نحو الأعلى' },
-      { value: 'down', fr: 'Vers le bas', ar: 'نحو الأسفل' },
-      { value: 'left', fr: 'Vers la gauche', ar: 'نحو اليسار' },
-      { value: 'right', fr: 'Vers la droite', ar: 'نحو اليمين' },
-      { value: 'back', fr: 'Vers le dos', ar: 'نحو الظهر' },
-      { value: 'front', fr: 'Vers l\'avant', ar: 'نحو الأمام' }
+      { value: 'no', fr: 'Non', ar: 'لا' },
+      { value: 'yes', fr: 'Oui', ar: 'نعم' }
     ],
     required: true
   },
   {
+    id: 'radiation_location',
+    step: 'R',
+    question: { fr: 'Où se propage-t-il ?', ar: 'أين ينتشر؟' },
+    type: 'text',
+    required: false
+  },
+  {
     id: 'severity',
     step: 'S',
-    question: { fr: 'Quelle est l\'intensité (échelle de 0 à 10) ?', ar: 'ما شدة الألم (من 0 إلى 10)؟' },
+    question: { fr: 'Niveau de douleur (0-10) ?', ar: 'مستوى الألم (0-10)؟' },
     type: 'scale',
     required: true
   },
   {
     id: 'timing',
     step: 'T',
-    question: { fr: 'Est-ce constant ou par épisodes ? Quand survient-il ?', ar: 'هل هو مستمر أم على شكل نوبات؟ متى يحدث؟' },
+    question: { fr: 'Comment évolue le symptôme ?', ar: 'كيف يتطور العرض؟' },
     type: 'select',
     options: [
-      { value: 'constant', fr: 'Constant', ar: 'مستمر' },
-      { value: 'intermittent', fr: 'Par épisodes', ar: 'على فترات' },
-      { value: 'morning', fr: 'Le matin', ar: 'في الصباح' },
-      { value: 'evening', fr: 'Le soir', ar: 'في المساء' },
-      { value: 'activity', fr: 'Pendant l\'activité', ar: 'أثناء النشاط' },
-      { value: 'rest', fr: 'Au repos', ar: 'أثناء الراحة' }
+      { value: 'continuous', fr: 'Continu', ar: 'مستمر' },
+      { value: 'episodic', fr: 'Par crises', ar: 'على شكل نوبات' },
+      { value: 'nocturnal', fr: 'Nocturne', ar: 'ليلي' },
+      { value: 'morning', fr: 'Matinal', ar: 'صباحي' },
+      { value: 'after-effort', fr: 'Après effort', ar: 'بعد المجهود' },
+      { value: 'postural', fr: 'Postural', ar: 'وضعي' }
     ],
     required: true
   },
   {
-    id: 'factors',
-    step: 'F',
-    question: { fr: 'Qu\'est-ce qui aggrave ou soulage ce symptôme ?', ar: 'ما الذي يزيد أو يخفف هذا العرض؟' },
-    type: 'multiselect',
-    options: [
-      { value: 'movement', fr: 'Mouvement (aggrave)', ar: 'الحركة (تزيد)' },
-      { value: 'rest', fr: 'Repos (soulage)', ar: 'الراحة (تخفف)' },
-      { value: 'heat', fr: 'Chaleur (soulage)', ar: 'الحرارة (تخفف)' },
-      { value: 'cold', fr: 'Froid (soulage)', ar: 'البرودة (تخفف)' },
-      { value: 'medication', fr: 'Médicaments (soulagent)', ar: 'الأدوية (تخفف)' },
-      { value: 'position', fr: 'Position (influence)', ar: 'الوضعية (تؤثر)' }
-    ],
-    required: false
-  },
-  {
     id: 'associated',
     step: 'I',
-    question: { fr: 'Y a-t-il des symptômes associés ?', ar: 'هل هناك أعراض مصاحبة؟' },
+    question: { fr: 'Y a-t-il d\'autres signes ?', ar: 'هل هناك علامات أخرى؟' },
     type: 'multiselect',
     options: [
       { value: 'fever', fr: 'Fièvre', ar: 'حمى' },
-      { value: 'nausea', fr: 'Nausée', ar: 'غثيان' },
+      { value: 'nausea', fr: 'Nausées', ar: 'غثيان' },
       { value: 'vomiting', fr: 'Vomissements', ar: 'قيء' },
-      { value: 'fatigue', fr: 'Fatigue', ar: 'تعب' },
-      { value: 'dizziness', fr: 'Vertiges', ar: 'دوار' },
-      { value: 'shortness', fr: 'Essoufflement', ar: 'ضيق تنفس' },
-      { value: 'sweating', fr: 'Transpiration', ar: 'تعرق' }
+      { value: 'diarrhea', fr: 'Diarrhée', ar: 'إسهال' },
+      { value: 'cough', fr: 'Toux', ar: 'سعال' },
+      { value: 'dyspnea', fr: 'Essoufflement', ar: 'ضيق تنفس' },
+      { value: 'chills', fr: 'Frissons', ar: 'قشعريرة' },
+      { value: 'dysuria', fr: 'Douleur à la miction', ar: 'ألم عند التبول' }
     ],
     required: false
   },
   {
-    id: 'treatment',
+    id: 'aggravating',
+    step: 'F1',
+    question: { fr: 'Qu\'est-ce qui aggrave ?', ar: 'ما الذي يزيد الأمر سوءاً؟' },
+    type: 'multiselect',
+    options: [
+      { value: 'movement', fr: 'Mouvement', ar: 'الحركة' },
+      { value: 'breathing', fr: 'Respiration', ar: 'التنفس' },
+      { value: 'eating', fr: 'Alimentation', ar: 'الأكل' },
+      { value: 'stress', fr: 'Stress', ar: 'التوتر' },
+      { value: 'none', fr: 'Aucun', ar: 'لا شيء' },
+      { value: 'other', fr: 'Autre', ar: 'أخرى' }
+    ],
+    required: false
+  },
+  {
+    id: 'relieving',
+    step: 'F2',
+    question: { fr: 'Qu\'est-ce qui soulage ?', ar: 'ما الذي يخفف؟' },
+    type: 'multiselect',
+    options: [
+      { value: 'rest', fr: 'Repos', ar: 'الراحة' },
+      { value: 'medication', fr: 'Médicaments', ar: 'الأدوية' },
+      { value: 'cold', fr: 'Froid', ar: 'البرد' },
+      { value: 'heat', fr: 'Chaud', ar: 'الحرارة' },
+      { value: 'nothing', fr: 'Rien', ar: 'لا شيء' },
+      { value: 'other', fr: 'Autre', ar: 'أخرى' }
+    ],
+    required: false
+  },
+  {
+    id: 'duration',
     step: 'T2',
-    question: { fr: 'Y a-t-il des antécédents médicaux, allergies ou traitements en cours ?', ar: 'هل هناك تاريخ طبي أو حساسية أو علاج حالي؟' },
-    type: 'text',
+    question: { fr: 'Depuis combien de temps ?', ar: 'منذ متى؟' },
+    type: 'select',
+    options: [
+      { value: '<24h', fr: '<24h', ar: '<24ساعة' },
+      { value: '1-3days', fr: '1–3 jours', ar: '1-3 أيام' },
+      { value: '>3days', fr: '+3 jours', ar: '+3 أيام' },
+      { value: '1week+', fr: '1 semaine+', ar: 'أسبوع+' }
+    ],
+    required: true
+  },
+  {
+    id: 'previous',
+    step: 'T3',
+    question: { fr: 'Cela s\'est-il déjà produit ?', ar: 'هل حدث هذا من قبل؟' },
+    type: 'select',
+    options: [
+      { value: 'yes', fr: 'Oui', ar: 'نعم' },
+      { value: 'no', fr: 'Non', ar: 'لا' },
+      { value: 'unknown', fr: 'Inconnu', ar: 'غير معروف' }
+    ],
+    required: false
+  },
+  {
+    id: 'trigger',
+    step: 'T4',
+    question: { fr: 'Y a-t-il un déclencheur connu ?', ar: 'هل هناك محفز معروف؟' },
+    type: 'multiselect',
+    options: [
+      { value: 'exercise', fr: 'Exercice', ar: 'التمرين' },
+      { value: 'trauma', fr: 'Traumatisme', ar: 'صدمة' },
+      { value: 'food', fr: 'Alimentation', ar: 'الطعام' },
+      { value: 'stress', fr: 'Stress', ar: 'التوتر' },
+      { value: 'none', fr: 'Aucun', ar: 'لا شيء' },
+      { value: 'other', fr: 'Autre', ar: 'أخرى' }
+    ],
     required: false
   }
 ];
@@ -151,6 +202,14 @@ export const MedicalAssistant = ({ selectedZone, onAssessmentComplete, language 
   const currentQuestion = ocrstfitQuestions[currentQuestionIndex];
   const canProceed = !currentQuestion?.required || answers[currentQuestion.id] !== undefined;
 
+  // Skip radiation location question if radiation is "no"
+  const shouldSkipQuestion = (question: OCRSTFITQuestion) => {
+    if (question.id === 'radiation_location' && answers['radiation'] !== 'yes') {
+      return true;
+    }
+    return false;
+  };
+
   const handleAnswerChange = (questionId: string, value: any) => {
     setAnswers(prev => ({
       ...prev,
@@ -159,8 +218,15 @@ export const MedicalAssistant = ({ selectedZone, onAssessmentComplete, language 
   };
 
   const handleNext = () => {
-    if (currentQuestionIndex < ocrstfitQuestions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
+    let nextIndex = currentQuestionIndex + 1;
+    
+    // Skip questions if needed
+    while (nextIndex < ocrstfitQuestions.length && shouldSkipQuestion(ocrstfitQuestions[nextIndex])) {
+      nextIndex++;
+    }
+    
+    if (nextIndex < ocrstfitQuestions.length) {
+      setCurrentQuestionIndex(nextIndex);
     } else {
       // Complete assessment
       const assessment: SymptomAssessment = {
@@ -175,8 +241,15 @@ export const MedicalAssistant = ({ selectedZone, onAssessmentComplete, language 
   };
 
   const handlePrevious = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(prev => prev - 1);
+    let prevIndex = currentQuestionIndex - 1;
+    
+    // Skip questions if needed
+    while (prevIndex >= 0 && shouldSkipQuestion(ocrstfitQuestions[prevIndex])) {
+      prevIndex--;
+    }
+    
+    if (prevIndex >= 0) {
+      setCurrentQuestionIndex(prevIndex);
     }
   };
 
@@ -328,6 +401,11 @@ export const MedicalAssistant = ({ selectedZone, onAssessmentComplete, language 
                 </span>
                 <span>10</span>
               </div>
+              <div className="text-xs text-medical-slate-500 text-center">
+                {(answers[currentQuestion.id] || 0) <= 3 && (language === 'fr' ? 'Léger' : 'خفيف')}
+                {(answers[currentQuestion.id] || 0) >= 4 && (answers[currentQuestion.id] || 0) <= 6 && (language === 'fr' ? 'Modéré' : 'متوسط')}
+                {(answers[currentQuestion.id] || 0) >= 7 && (language === 'fr' ? 'Sévère' : 'شديد')}
+              </div>
             </div>
           )}
 
@@ -337,7 +415,7 @@ export const MedicalAssistant = ({ selectedZone, onAssessmentComplete, language 
               value={answers[currentQuestion.id] || ''}
               onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
               className="glass border-white/30"
-              placeholder={language === 'fr' ? 'Tapez votre réponse...' : 'اكتب إجابتك...'}
+              placeholder={language === 'fr' ? 'Précisez...' : 'حدد...'}
             />
           )}
         </div>

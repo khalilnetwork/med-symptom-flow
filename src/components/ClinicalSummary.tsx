@@ -1,3 +1,4 @@
+
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { FileText, MapPin, Clock, Zap, Activity, Stethoscope, Pill, User } from 'lucide-react';
@@ -24,28 +25,38 @@ export const ClinicalSummary = ({ assessments, patientData, language }: Clinical
     // Map answer values to readable text
     const answerMaps: Record<string, Record<string, { fr: string; ar: string }>> = {
       onset: {
-        minutes: { fr: 'Quelques minutes', ar: 'بضع دقائق' },
-        hours: { fr: 'Quelques heures', ar: 'بضع ساعات' },
-        days: { fr: 'Quelques jours', ar: 'بضعة أيام' },
-        weeks: { fr: 'Quelques semaines', ar: 'بضعة أسابيع' },
-        months: { fr: 'Quelques mois', ar: 'بضعة أشهر' }
+        brutal: { fr: 'Brutal', ar: 'مفاجئ' },
+        progressif: { fr: 'Progressif', ar: 'تدريجي' },
+        'post-trauma': { fr: 'Post-trauma', ar: 'بعد صدمة' },
+        'post-meal': { fr: 'Après repas', ar: 'بعد الوجبة' },
+        unknown: { fr: 'Inconnu', ar: 'غير معروف' }
       },
       character: {
-        sharp: { fr: 'Douleur aiguë', ar: 'ألم حاد' },
         burning: { fr: 'Brûlure', ar: 'حرقة' },
-        throbbing: { fr: 'Pulsatile', ar: 'نابض' },
-        cramping: { fr: 'Crampes', ar: 'تشنج' },
+        stabbing: { fr: 'Élancements', ar: 'طعن' },
+        tightness: { fr: 'Serrement', ar: 'انقباض' },
         tingling: { fr: 'Picotements', ar: 'وخز' },
+        pulsating: { fr: 'Pulsation', ar: 'نبض' },
         numbness: { fr: 'Engourdissement', ar: 'خدر' },
-        pressure: { fr: 'Pression', ar: 'ضغط' }
+        heaviness: { fr: 'Lourdeur', ar: 'ثقل' }
       },
       timing: {
-        constant: { fr: 'Constant', ar: 'مستمر' },
-        intermittent: { fr: 'Par épisodes', ar: 'على فترات' },
-        morning: { fr: 'Le matin', ar: 'في الصباح' },
-        evening: { fr: 'Le soir', ar: 'في المساء' },
-        activity: { fr: 'Pendant l\'activité', ar: 'أثناء النشاط' },
-        rest: { fr: 'Au repos', ar: 'أثناء الراحة' }
+        continuous: { fr: 'Continu', ar: 'مستمر' },
+        episodic: { fr: 'Par crises', ar: 'على شكل نوبات' },
+        nocturnal: { fr: 'Nocturne', ar: 'ليلي' },
+        morning: { fr: 'Matinal', ar: 'صباحي' },
+        'after-effort': { fr: 'Après effort', ar: 'بعد المجهود' },
+        postural: { fr: 'Postural', ar: 'وضعي' }
+      },
+      duration: {
+        '<24h': { fr: '<24h', ar: '<24ساعة' },
+        '1-3days': { fr: '1–3 jours', ar: '1-3 أيام' },
+        '>3days': { fr: '+3 jours', ar: '+3 أيام' },
+        '1week+': { fr: '1 semaine+', ar: 'أسبوع+' }
+      },
+      radiation: {
+        no: { fr: 'Non', ar: 'لا' },
+        yes: { fr: 'Oui', ar: 'نعم' }
       }
     };
 
@@ -71,8 +82,9 @@ export const ClinicalSummary = ({ assessments, patientData, language }: Clinical
       const onset = getAnswerText('onset', assessment.answers.onset);
       const character = getAnswerText('character', assessment.answers.character);
       const severity = assessment.answers.severity || 0;
+      const duration = getAnswerText('duration', assessment.answers.duration);
       
-      return `${assessment.zoneName} (${character}, ${severity}/10, ${onset})`;
+      return `${assessment.zoneName} (${character}, ${severity}/10, ${onset}, ${duration})`;
     });
 
     const associatedSymptoms = completedAssessments
@@ -191,9 +203,37 @@ export const ClinicalSummary = ({ assessments, patientData, language }: Clinical
                   </div>
                 </div>
 
+                {/* Duration */}
+                <div>
+                  <div className="flex items-center space-x-1 mb-1">
+                    <Clock className="w-3 h-3 text-medical-slate-500" />
+                    <span className="font-medium text-medical-slate-600">
+                      {language === 'fr' ? 'Durée' : 'المدة'}
+                    </span>
+                  </div>
+                  <div className="text-medical-slate-700">
+                    {getAnswerText('duration', assessment.answers.duration)}
+                  </div>
+                </div>
+
+                {/* Radiation */}
+                {assessment.answers.radiation === 'yes' && assessment.answers.radiation_location && (
+                  <div className="col-span-2">
+                    <div className="flex items-center space-x-1 mb-1">
+                      <Zap className="w-3 h-3 text-medical-slate-500" />
+                      <span className="font-medium text-medical-slate-600">
+                        {language === 'fr' ? 'Irradiation' : 'الانتشار'}
+                      </span>
+                    </div>
+                    <div className="text-medical-slate-700">
+                      {assessment.answers.radiation_location}
+                    </div>
+                  </div>
+                )}
+
                 {/* Associated Symptoms */}
                 {assessment.answers.associated && assessment.answers.associated.length > 0 && (
-                  <div>
+                  <div className="col-span-2">
                     <div className="flex items-center space-x-1 mb-1">
                       <Pill className="w-3 h-3 text-medical-slate-500" />
                       <span className="font-medium text-medical-slate-600">
@@ -201,7 +241,7 @@ export const ClinicalSummary = ({ assessments, patientData, language }: Clinical
                       </span>
                     </div>
                     <div className="text-medical-slate-700">
-                      {(assessment.answers.associated as string[]).length} {language === 'fr' ? 'symptômes' : 'أعراض'}
+                      {(assessment.answers.associated as string[]).join(', ')}
                     </div>
                   </div>
                 )}
